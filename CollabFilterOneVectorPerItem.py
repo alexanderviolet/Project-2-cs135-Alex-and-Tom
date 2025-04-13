@@ -56,10 +56,10 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         # TIP: use self.n_factors to access number of hidden dimensions
         self.param_dict = dict(
             mu=ag_np.ones(1), 
-            b_per_user= ag_np.ones(self.n_factors), # FIX dimensionality
-            c_per_item= ag_np.ones(self.n_factors), # FIX dimensionality
-            U=0.001 * random_state.randn(self.n_factors), # FIX dimensionality
-            V=0.001 * random_state.randn(self.n_factors), # FIX dimensionality
+            b_per_user= ag_np.ones(n_users), # FIX dimensionality
+            c_per_item= ag_np.ones(n_items), # FIX dimensionality
+            U=0.001 * random_state.randn(n_users, self.n_factors), # (n_users, n_factors)
+            V=0.001 * random_state.randn(n_items, self.n_factors)
             )
         
         # For testing
@@ -91,17 +91,12 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         yhat_indexable = yhat_N.shape
         print("userID: ", user_id_N.shape)
         print("itemID: ", item_id_N.shape)
-        
-        U_user_NF = U[user_id_N]           # shape (N, F)
+        U_user_NF = U[user_id_N]           
         V_item_NF = V[item_id_N]
-        # Loop through user ids considered and append each prediction to yhat
-        # for n, user_id in enumerate(user_id_N):
-        #     print("b_per_user at index: ",b_per_user[user_id], "   user id: ", user_id)
-        #     # predict for some element yhat_N at i,j (note: we're going off different indexing here)
-        #     yhat_indexable[n] = mu + b_per_user[user_id] + c_per_item[item_id_N[n]] + (U[user_id].T * V[item_id_N[n]])
-        # dot_N = ag_np.sum(U_user_NF * V_item_NF, axis=1)
-        yhat_N = mu + b_per_user + c_per_item + ag_np.sum(U_user_NF * V_item_NF, axis=1)
-
+        
+        dot_product = ag_np.sum(U_user_NF * V_item_NF, axis=1)
+        yhat_N = mu + b_per_user[user_id_N] + c_per_item[item_id_N]
+        
         return yhat_N
 
 
@@ -120,15 +115,19 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         '''
         U = param_dict['U']
         V = param_dict['V']
+        b_per_user = param_dict['b_per_user']
+        c_per_item = param_dict['c_per_item']
+        
         user_id_N, item_id_N, y_N = data_tuple
         # TODO compute loss
-        # TIP: use self.alpha to access regularization strength
-        # y_N = data_tuple[2]
+        U_user_NF = U[user_id_N]           
+        V_item_NF = V[item_id_N]
+        
         yhat_N = self.predict(data_tuple[0], data_tuple[1], **param_dict)
-        # # loss_total = ag_np.mean(ag_np.sum(ag_np.absolute(y_N - yhat_N)))
-        loss_total = self.alpha * (ag_np.sum(V ** 2) + ag_np.sum(U ** 2)) + (ag_np.sum(yhat_N - self.param_dict.['mu'] - b_per_user[]))
+        Penalty = self.alpha * (ag_np.sum(V ** 2) + ag_np.sum(U ** 2)) 
+        MSE_ERROR = ag_np.mean((y_N - yhat_N) ** 2)
 
-        return loss_total    
+        return Penalty + MSE_ERROR
 
 
 if __name__ == '__main__':
