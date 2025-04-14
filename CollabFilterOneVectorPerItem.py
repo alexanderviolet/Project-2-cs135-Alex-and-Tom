@@ -106,6 +106,7 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         -------
         loss : float scalar
         '''
+        mu = param_dict['mu']
         U = param_dict['U']
         V = param_dict['V']
         b_per_user = param_dict['b_per_user']
@@ -118,7 +119,8 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         
         yhat_N = self.predict(data_tuple[0], data_tuple[1], **param_dict)
         Penalty = self.alpha * (ag_np.sum(V ** 2) + ag_np.sum(U ** 2)) 
-        MSE_ERROR = ag_np.mean((y_N - yhat_N) ** 2)
+        dot_product = ag_np.sum(U[user_id_N] * V[item_id_N], axis=1)
+        MSE_ERROR = ag_np.mean((y_N - mu - b_per_user[user_id_N] - c_per_item[item_id_N] - dot_product) ** 2)
 
         return Penalty + MSE_ERROR
 
@@ -130,7 +132,7 @@ if __name__ == '__main__':
     # Create the model and initialize its parameters
     # to have right scale as the dataset (right num users and items)
     model = CollabFilterOneVectorPerItem(
-        n_epochs=10, batch_size=10000, step_size=0.1,
+        n_epochs=10, batch_size=10000, step_size='adaptive',
         n_factors=2, alpha=0.0)
     model.init_parameter_dict(n_users, n_items, train_tuple)
 
