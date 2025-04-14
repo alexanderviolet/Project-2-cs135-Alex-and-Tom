@@ -61,10 +61,6 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
             U=0.001 * random_state.randn(n_users, self.n_factors), # (n_users, n_factors)
             V=0.001 * random_state.randn(n_items, self.n_factors)
             )
-        
-        # For testing
-        print("param array: ", self.param_dict)
-
 
     def predict(self, user_id_N, item_id_N,
                 mu=None, b_per_user=None, c_per_item=None, U=None, V=None):
@@ -88,14 +84,11 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         N = user_id_N.size
         yhat_N = ag_np.ones(N)
         
-        yhat_indexable = yhat_N.shape
-        print("userID: ", user_id_N.shape)
-        print("itemID: ", item_id_N.shape)
         U_user_NF = U[user_id_N]           
         V_item_NF = V[item_id_N]
         
         dot_product = ag_np.sum(U_user_NF * V_item_NF, axis=1)
-        yhat_N = mu + b_per_user[user_id_N] + c_per_item[item_id_N]
+        yhat_N = mu + b_per_user[user_id_N] + c_per_item[item_id_N] + dot_product
         
         return yhat_N
 
@@ -133,7 +126,6 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
 if __name__ == '__main__':
 
     # Load the dataset
-    print("MAIN IS CALLED YURRRR\n")
     train_tuple, valid_tuple, test_tuple, n_users, n_items = load_train_valid_test_datasets()
     # Create the model and initialize its parameters
     # to have right scale as the dataset (right num users and items)
