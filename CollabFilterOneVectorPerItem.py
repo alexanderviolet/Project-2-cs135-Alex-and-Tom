@@ -117,11 +117,15 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         U_user_NF = U[user_id_N]           
         V_item_NF = V[item_id_N]
         
-        yhat_N = self.predict(data_tuple[0], data_tuple[1], **param_dict)
-        Penalty = self.alpha * (ag_np.sum(V ** 2) + ag_np.sum(U ** 2)) 
-        dot_product = ag_np.sum(U[user_id_N] * V[item_id_N], axis=1)
-        MSE_ERROR = ag_np.mean((y_N - mu - b_per_user[user_id_N] - c_per_item[item_id_N] - dot_product) ** 2)
+        yhat_N = self.predict(user_id_N, item_id_N, **param_dict)
 
+        Penalty = self.alpha * (ag_np.sum(V ** 2) + ag_np.sum(U ** 2)) 
+
+        # dot_product = ag_np.sum(U[user_id_N] * V[item_id_N], axis=1)
+
+        # MSE_ERROR = ag_np.sum((y_N - mu - b_per_user[user_id_N] - c_per_item[item_id_N] - dot_product) ** 2)
+
+        MSE_ERROR = ag_np.sum((y_N - yhat_N) ** 2)
         return Penalty + MSE_ERROR
 
 
