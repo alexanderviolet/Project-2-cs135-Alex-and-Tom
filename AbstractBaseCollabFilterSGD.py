@@ -237,10 +237,10 @@ class AbstractBaseCollabFilterSGD(object):
                     avg_grad_norm_str = ' | '.join(avg_grad_norm_str_list)
                     fmt_str = ("epoch %11.3f | loss_total % 11.5f |"
                               + " tr RMSE % 11.5f | va RMSE % 11.5f | %s")
-                    print(fmt_str % (
-                        epoch, loss if epoch <= 2 else smooth_loss,
-                        train_perf_dict['rmse'], valid_perf_dict['rmse'],
-                        avg_grad_norm_str))
+                    # print(fmt_str % (
+                    #     epoch, loss if epoch <= 2 else smooth_loss,
+                    #     train_perf_dict['rmse'], valid_perf_dict['rmse'],
+                    #     avg_grad_norm_str))
 
                 ## Update each parameter by taking step in direction of gradient
                 epoch += n_per_batch / n_total 
