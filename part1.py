@@ -31,11 +31,7 @@ for idx, K in enumerate(K_values):
         K,
         model.trace_epoch,
         model.trace_rmse_train,
-        model.trace_rmse_valid,
-        # model.trace_mae_train,
-        # model.trace_mae_valid
-        
-        
+        model.trace_rmse_valid,               
     ))
     
 fig, axes = plt.subplots(1, len(all_traces), figsize=(15, 4), sharey=True)
