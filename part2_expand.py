@@ -102,27 +102,56 @@ param_grid = {
     "reg_all": [0.1],      # Regularization term for all parameters
     "n_epochs": [30]          # Number of SGD iterations
 }
-model = model_selection.search.RandomizedSearchCV(SVDpp, param_grid, n_iter=1, measures=['mae'], refit=True, n_jobs=-1)
-model.fit(dev_set) 
+# model = model_selection.search.RandomizedSearchCV(SVDpp, param_grid, n_iter=1, measures=['mae'], refit=True, n_jobs=-1)
+# model.fit(dev_set) 
+# print("Lowest MAE: ", model.best_score['mae'])
+# print("Best params:", model.best_params['mae'])
+# best_model = model.best_estimator['mae']
+# best_model.fit(dev_set_for_fit)
 
-print("Lowest MAE: ", model.best_score['mae'])
-print("Best params:", model.best_params['mae'])
-best_model = model.best_estimator['mae']
+best_model = SVDpp(n_factors=100, lr_all=0.01, reg_all=0.1, n_epochs=30)
 best_model.fit(dev_set_for_fit)
 
 yproba1_te = best_model.test(dev_set_for_predict)
 
-print(0 in dev_set_for_fit._raw2inner_id_users)
-print(113 in dev_set_for_fit._raw2inner_id_items)
-for i in range(5):
+# print(0 in dev_set_for_fit._raw2inner_id_users)
+# print(113 in dev_set_for_fit._raw2inner_id_items)
+for i in range(25):
     print(yproba1_te[i][2],round(yproba1_te[i][3]))
-    
+# print(yproba1_te)
 
 
 # Convert cv_results_ to a DataFrame
-results_df = pd.DataFrame(model.cv_results)
+# results_df = pd.DataFrame(model.cv_results)
 
 
 # Show just the params and corresponding mean MAE
 # print(results_df[['params', 'mean_test_mae']].sort_values(by='mean_test_mae'))
 
+# Global Mean:  3.529480398257623
+# ('772', '36', 3.0)
+# 3.0 3
+# 4.0 4
+# 3.0 3
+# 5.0 4
+# 3.0 3
+# 2.0 3
+# 4.0 4
+# 2.0 3
+# 4.0 4
+# 1.0 2
+# 5.0 4
+# 3.0 4
+# 3.0 4
+# 4.0 4
+# 3.0 3
+# 3.0 3
+# 4.0 4
+# 3.0 4
+# 2.0 2
+# 4.0 4
+# 4.0 3
+# 2.0 2
+# 1.0 2
+# 2.0 2
+# 4.0 3
