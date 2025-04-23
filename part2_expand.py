@@ -72,6 +72,7 @@ dev_set = Dataset.load_from_file(
 dev_set_for_fit = dev_set.build_full_trainset()
 dev_set_for_predict = dev_set_for_fit.build_testset()
 dev_set_for_fit.global_mean
+
 print("Global Mean: ", dev_set_for_fit.global_mean)
 
 # print("Length of prediction set: ",len(dev_set_for_predict))
