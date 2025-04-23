@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sklearn
 
-from surprise import SVD,SVDpp
+from surprise import SVD,SVDpp,KNN
 from surprise import Dataset, Reader, accuracy
 from surprise.model_selection import cross_validate
 from surprise import model_selection
@@ -33,26 +33,30 @@ reader = Reader(
 
 
 
-# ## Load the entire dev set in surprise's format
+##LOADING DATA##
 train_set = Dataset.load_from_file(
     'data_movie_lens_100k/ratings_all_development_set.csv', reader=reader)
 
 
 
-test_df = pd.read_csv('data_movie_lens_100k/ratings_masked_leaderboard_set.csv')
+df = pd.read_csv('data_movie_lens_100k/ratings_masked_leaderboard_set.csv')
+data = Dataset.load_from_df(df[['user_id', 'item_id', 'rating']], reader)
 
-uid = test_df['user_id'].values
-iid = test_df['item_id'].values
 
+##TRAINING##
 param_grid = {
     "n_factors": [1,10,50,100],
-    "lr_all": [0.00000000000001]
+    "lr_all": [0.1]
 }
-model = model_selection.search.RandomizedSearchCV(SVD, param_grid, n_iter=4, measures=['mae'], refit=True, n_jobs=-1)
+model = model_selection.search.RandomizedSearchCV(KNN, param_grid, n_iter=4, measures=['mae'], refit=True, n_jobs=-1)
 model.fit(train_set)
 print("Best score:", model.best_score['mae'])
 print("Best params:", model.best_params['mae'])
 best_model = model.best_estimator['mae']
-test_set = list(zip(test_df['user_id'], test_df['item_id'], [0.0] * len(test_df)))
 
-yproba1_te = model_predict.predict(uid,iid)
+
+
+# test_set = list(zip(test_df['user_id'], test_df['item_id'], [0.0] * len(test_df)))
+
+yproba1_te = best_model.predict(94,384)
+print(yproba1_te)
