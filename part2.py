@@ -37,6 +37,7 @@ train_set = Dataset.load_from_file(
 df = pd.read_csv('data_movie_lens_100k/ratings_masked_leaderboard_set.csv')
 data = Dataset.load_from_df(df[['user_id', 'item_id', 'rating']], reader)
 
+##Set Up 
 DATA_PATH = 'data_movie_lens_100k/' # TODO fixme: Path to where dataset csv files live on your system
 if not os.path.exists(os.path.join(DATA_PATH, 'select_movies.csv')):
     try:
@@ -45,7 +46,6 @@ if not os.path.exists(os.path.join(DATA_PATH, 'select_movies.csv')):
         assert os.path.exists(os.path.join(DATA_PATH, 'select_movies.csv'))
     except AssertionError:
         print("Please store path to movie_lens_100k dataset in DATA_PATH")
-
 assert os.path.exists(os.path.join(DATA_PATH, 'select_movies.csv'))
 
 

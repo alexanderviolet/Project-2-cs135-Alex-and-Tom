@@ -66,6 +66,10 @@ if not os.path.exists(os.path.join(DATA_PATH, 'select_movies.csv')):
 assert os.path.exists(os.path.join(DATA_PATH, 'select_movies.csv'))
 
 
+df_masked = pd.read_csv("data_movie_lens_100k/ratings_masked_leaderboard_set.csv")
+df_masked['rating'] = 0 
+predict_set = list(df_masked.itertuples(index=False, name=None))
+
 
 dev_set = Dataset.load_from_file(
    os.path.join(DATA_PATH, 'ratings_all_development_set.csv'), reader=reader)
@@ -76,7 +80,7 @@ dev_set_for_fit.global_mean
 print("Global Mean: ", dev_set_for_fit.global_mean)
 
 # print("Length of prediction set: ",len(dev_set_for_predict))
-print(dev_set_for_predict[0])
+# print(dev_set_for_predict[0])
 
 # out_test_set = Dataset.load_from_file(
 #    os.path.join(DATA_PATH, 'ratings_masked_leaderboard_set.csv'), reader=reader)
@@ -92,16 +96,16 @@ print(dev_set_for_predict[0])
 #     "lr_all": [0.005]
 # }
 
-param_grid = {
-    # "n_factors": [20, 50, 100],        # Latent dimensions (embedding size)
-    # "lr_all": [0.002, 0.005, 0.01],    # Learning rate for all parameters
-    # "reg_all": [0.02, 0.05, 0.1],      # Regularization term for all parameters
-    # "n_epochs": [10, 20, 30]
-    "n_factors": [100],        # Latent dimensions (embedding size)
-    "lr_all": [0.01],    # Learning rate for all parameters
-    "reg_all": [0.1],      # Regularization term for all parameters
-    "n_epochs": [30]          # Number of SGD iterations
-}
+# param_grid = {
+#     # "n_factors": [20, 50, 100],        # Latent dimensions (embedding size)
+#     # "lr_all": [0.002, 0.005, 0.01],    # Learning rate for all parameters
+#     # "reg_all": [0.02, 0.05, 0.1],      # Regularization term for all parameters
+#     # "n_epochs": [10, 20, 30]
+#     "n_factors": [100],        # Latent dimensions (embedding size)
+#     "lr_all": [0.01],    # Learning rate for all parameters
+#     "reg_all": [0.1],      # Regularization term for all parameters
+#     "n_epochs": [30]          # Number of SGD iterations
+# }
 # model = model_selection.search.RandomizedSearchCV(SVDpp, param_grid, n_iter=1, measures=['mae'], refit=True, n_jobs=-1)
 # model.fit(dev_set) 
 # print("Lowest MAE: ", model.best_score['mae'])
@@ -109,15 +113,22 @@ param_grid = {
 # best_model = model.best_estimator['mae']
 # best_model.fit(dev_set_for_fit)
 
+##TRAIN AND FIT
 best_model = SVDpp(n_factors=100, lr_all=0.01, reg_all=0.1, n_epochs=30)
 best_model.fit(dev_set_for_fit)
 
-yproba1_te = best_model.test(dev_set_for_predict)
+
+predictions = [best_model.predict(uid, iid) for (uid, iid, _) in predict_set]
+for i in range(25):
+    print(predictions[i][3])
+
+
+# yproba1_te = best_model.test(dev_set_for_predict)
 
 # print(0 in dev_set_for_fit._raw2inner_id_users)
 # print(113 in dev_set_for_fit._raw2inner_id_items)
-for i in range(25):
-    print(yproba1_te[i][2],round(yproba1_te[i][3]))
+# for i in range(25):
+#     print(yproba1_te[i][2],round(yproba1_te[i][3]))
 # print(yproba1_te)
 
 
