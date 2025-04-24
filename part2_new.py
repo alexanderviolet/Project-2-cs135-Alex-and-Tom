@@ -67,8 +67,14 @@ assert os.path.exists(os.path.join(DATA_PATH, 'select_movies.csv'))
 
 
 df_masked = pd.read_csv("data_movie_lens_100k/ratings_masked_leaderboard_set.csv")
-df_masked['rating'] = 0 
-predict_set = list(df_masked.itertuples(index=False, name=None))
+
+df_masked['user_id'] = df_masked['user_id'].astype(str)
+df_masked['item_id'] = df_masked['item_id'].astype(str)
+df_masked['rating'] = 0
+
+
+# Create a list of (uid, iid) pairs
+predict_pairs = list(zip(df_masked['user_id'], df_masked['item_id'],df_masked['rating']))
 
 
 dev_set = Dataset.load_from_file(
@@ -78,13 +84,6 @@ dev_set_for_predict = dev_set_for_fit.build_testset()
 dev_set_for_fit.global_mean
 
 print("Global Mean: ", dev_set_for_fit.global_mean)
-
-# print("Length of prediction set: ",len(dev_set_for_predict))
-# print(dev_set_for_predict[0])
-
-# out_test_set = Dataset.load_from_file(
-#    os.path.join(DATA_PATH, 'ratings_masked_leaderboard_set.csv'), reader=reader)
-
 
 
 ##TRAINING##---------------------------------------
@@ -118,9 +117,16 @@ best_model = SVDpp(n_factors=100, lr_all=0.01, reg_all=0.1, n_epochs=30)
 best_model.fit(dev_set_for_fit)
 
 
-predictions = [best_model.predict(uid, iid) for (uid, iid, _) in predict_set]
+predictions = [best_model.predict(uid, iid) for (uid, iid, _) in predict_pairs]
 for i in range(25):
     print(predictions[i][3])
+# print("Type is: :",predictions[0].type())
+# predictions = np.array(predictions, dtype=float)
+ratings_only = [pred[3] for pred in predictions]  # extract just the ratings
+ratings_only = np.array(ratings_only, dtype=float)
+np.savetxt("predicted_ratings_leaderboard.txt", ratings_only, fmt="%.6f")
+
+# np.savetxt("predicted_ratings_leaderboard.txt", predictions[:][3])
 
 
 # yproba1_te = best_model.test(dev_set_for_predict)
