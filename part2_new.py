@@ -17,7 +17,7 @@ from surprise import Dataset, Reader, accuracy
 from surprise.model_selection import cross_validate
 from surprise import model_selection
 
-from surprise import SVD, SVDpp
+from surprise import SVD, SVDpp, knn
 from surprise import Dataset, Reader
 from surprise.model_selection import RandomizedSearchCV
 import matplotlib.pyplot as plt
